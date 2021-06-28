@@ -1,0 +1,2 @@
+# flutter_state_management_encyclopedia
+flutter state management trials
