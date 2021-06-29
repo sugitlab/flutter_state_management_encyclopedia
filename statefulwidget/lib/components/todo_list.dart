@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/task.dart';
-import './task_details.dart';
+import '../task_details.dart';
 
 class TodoList extends StatelessWidget {
   const TodoList({Key? key, required this.tasks, required this.toggle})
