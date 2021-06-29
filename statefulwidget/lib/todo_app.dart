@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import './components/todo_list.dart';
+import './components/todo_list_header.dart';
 import './models/task.dart';
 
 class TodoApp extends StatelessWidget {
@@ -25,12 +27,19 @@ class _TodoAppBodyState extends State<TodoAppBody> {
   List<Task> tasks = [];
 
   void addNewTask(String title) {
+    const uuid = Uuid();
     setState(() {
       if (tasks.isNotEmpty) {
-        tasks.add(Task(title, false));
+        tasks.add(Task(title, false, uuid.v4()));
       } else {
-        tasks = [Task(title, false)];
+        tasks = [Task(title, false, uuid.v4())];
       }
+    });
+  }
+
+  void toggleStatus(String id) {
+    setState(() {
+      tasks.firstWhere((task) => task.id == id).toggle();
     });
   }
 
@@ -56,14 +65,14 @@ class _TodoAppBodyState extends State<TodoAppBody> {
     );
   }
 
-  String inputField = '';
-  void updateInput(String text) {
-    setState(() {
-      inputField = text;
-    });
-  }
-
   Widget _builder(BuildContext context) {
+    String inputField = '';
+    void updateInput(String text) {
+      setState(() {
+        inputField = text;
+      });
+    }
+
     return Column(
       children: <Widget>[
         Padding(
@@ -85,6 +94,9 @@ class _TodoAppBodyState extends State<TodoAppBody> {
           child: TextButton(
             child: const Text('Save'),
             onPressed: () {
+              if (inputField.isEmpty) {
+                return;
+              }
               addNewTask(inputField);
               updateInput('');
               Navigator.pop(context);
@@ -98,8 +110,16 @@ class _TodoAppBodyState extends State<TodoAppBody> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: TodoList(tasks: tasks),
+      body: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const TodoListHeader(),
+            Flexible(
+              child: TodoList(tasks: tasks, toggle: toggleStatus),
+            ),
+          ],
+        ),
       ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
